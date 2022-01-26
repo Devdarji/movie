@@ -20,10 +20,10 @@ class movieDataReleaseDateSerializers(serializers.ModelSerializer):
         fields = ('relase_date',)
 
 
-class movieDataDurationSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = MovieData
-        fields = ('duration',)
+# class movieDataDurationSerializers(serializers.ModelSerializer):
+#     class Meta:
+#         model = MovieData
+#         fields = ('duration',)
 
 class movieDataDescriptionSerializers(serializers.ModelSerializer):
     class Meta:

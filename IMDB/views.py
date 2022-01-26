@@ -13,8 +13,12 @@ def home(request):
     url = "https://www.imdb.com/chart/top?ref_=nv_mv_250"
     site = requests.get(url)
     print(site.status_code)
-    soup = BeautifulSoup(site.text, "html.parser")
+    # print(site.content)
+    soup = BeautifulSoup(site.content, "html.parser")
+    # print(soup.prettify())
+    # print(soup.title.string)
     table_row_data = soup.find_all('td', class_="titleColumn")
+    # print(table_row_data)
 
     movies_id = []
     for i in range(len(table_row_data)):
@@ -27,31 +31,53 @@ def home(request):
             f"https://www.imdb.com{li}?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=9703a62d-b88a-4e30-ae12-90fcafafa3fc&pf_rd_r=68K4HZBZAE593S4F7G4E&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=top&ref_=chttp_tt_{count}")
         count += 1
 
+    # print(movies_urls[0])
+
     movies_title = []
     movies_rating = []
     movies_release_date = []
-    movies_duration = []
+    # movies_duration = []
     movies_description = []
 
     for i in range(len(movies_urls)):
         movies = movies_urls[i]
         movie_site = requests.get(movies)
         movie_soup = BeautifulSoup(
-            movie_site.content, 'lxml', from_encoding="iso-8859-1")
+            movie_site.content, "html.parser", from_encoding="iso-8859-1")
+        
         movies_title.append(movie_soup.find(
             'div', {"class": "jxsVNt"}).find('h1').text.replace(u'\xa0', u' '))
+
+        # print(movie_soup.find(
+        #     'div', {"class": "jxsVNt"}).find('h1').text.replace(u'\xa0', u' '))
+        
         movies_rating.append(movie_soup.find(
             'div', {"class": "bmbYRW"}).find('span').text)
-        movies_release_date.append(movie_soup.find('div', {"class": "hWHMKr"}).find(
-            'a', {"class": "ipc-link"}).text.rstrip('\n'))
-        movies_duration.append(movie_soup.find(
-            'div', {"class": "hWHMKr"}).find('li', {"class": "ipc-inline-list__item"}).text.strip())
+
+        # print(movie_soup.find(
+        #     'div', {"class": "bmbYRW"}).find('span').text)
+
+        movies_release_date.append(movie_soup.find('div', {"class": "hWHMKr"}).find('a', {"class": "ipc-link"}).text.rstrip('\n'))
+        
+        # print(movie_soup.find('div', {"class": "hWHMKr"}).find(
+        #     'a', {"class": "ipc-link"}).text.rstrip('\n'))
+
+        # movies_duration.append(movie_soup.find(
+        #     'div', {"class": "hWHMKr"}).find('li', {"class": "ipc-inline-list__item"}).text.strip())
+
+        # print(movie_soup.find('div', {"class": "hWHMKr"}).find('li', {"class": "ipc-inline-list__item"}).text.strip())
+
+
         movies_description.append(movie_soup.find(
             'div', {"class": "frcskz"}).text.strip())
 
+        # print(movie_soup.find('div', {"class": "frcskz"}).text.strip())
+
+    # print(movies_title[0])
+
     for i in range(len(movies_urls)):
         movie = MovieData(
-            title=movies_title[i], rating=movies_rating[i], release_date=movies_release_date[i], duration=movies_duration[i], description=movies_description[i])
+            title=movies_title[i], rating=movies_rating[i], relase_date=movies_release_date[i], description=movies_description[i])
         print(movie)
         movie.save()
 
@@ -79,11 +105,11 @@ class MovieReleaseDate(APIView):
         return Response(serializer.data)
 
 
-class MovieDuration(APIView):
-    def get(self, request):
-        movie = MovieData.objects.values('duration')
-        serializer = movieDataTitleSerializers(movie, many=True)
-        return Response(serializer.data)
+# class MovieDuration(APIView):
+#     def get(self, request):
+#         movie = MovieData.objects.values('duration')
+#         serializer = movieDataTitleSerializers(movie, many=True)
+#         return Response(serializer.data)
 
 
 class MovieDescription(APIView):
